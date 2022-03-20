@@ -1,0 +1,4 @@
+# EXCLUDING VENV DIRECTORIES
+include
+Lib
+Scripts
