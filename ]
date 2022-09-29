@@ -1,0 +1,122 @@
+const extractAudio = require('ffmpeg-extract-audio');
+const fs = require('fs');
+// const speech = require('@google-cloud/speech');
+const axios = require('axios');
+
+const main = async () => {
+  try {
+  // This extracts the audio from the video
+  await extractAudio({
+    // this is the input video file in mp4
+    input: 'assets/video_recording.mp4',
+    // this is the output audio file in mp3
+    output: 'assets/converted.mp3'
+  });
+
+  const assembly = axios.create({
+    baseURL: "https://api.assemblyai.com/v2",
+    headers: {
+      "Authorization": "ea6790a30c244e10a357fdb67eef0318",
+      "Content-Type": "application/json",
+      "transfer-encoding": "chunked",
+    }
+  });
+
+  const file = "./assets/converted.mp3";
+  var fileURI = "";
+    const langCode = "ja";
+
+  fs.readFile(file, async (err, data) => {
+    if (err) return console.error(err);
+
+    const fileData = await assembly.post("/upload", data)
+    fileURI = fileData?.data?.upload_url;
+
+    const postData = await assembly.post("/transcript", {
+        audio_url: fileURI,
+        language_code: langCode
+    });
+    const transcriptID = postData?.data?.id
+
+    var getData = await assembly.get(`/transcript/${transcriptID}`);
+    while(getData?.data?.status !== "completed")
+      getData = await assembly.get(`/transcript/${transcriptID}`);
+
+    const sourceText = getData?.data?.text;
+
+    const encodedParams = new URLSearchParams();
+    encodedParams.append("q", "数日後クオンの母親の毎さんに呼ばれて愛変わらずbgだな毎さんそれじゃ早速");
+    encodedParams.append("target", "en");
+    encodedParams.append("source", "ja");
+
+    const options = {
+      method: 'POST',
+      url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'Accept-Encoding': 'application/gzip',
+        'X-RapidAPI-Key': 'ea36c32c45mshf235e5b46ea12b6p157005jsn655911988c03',
+        'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+      },
+      data: encodedParams
+    };
+
+    axios.request(options).then(function (response) {
+	    console.log(response?.data);
+    }).catch(function (error) {
+	    console.error(error);
+    });
+  });
+  } catch(err) {
+    console.log(err);
+  }
+
+  // assembly
+  //   .post("/transcript", {
+  //     audio_url: "https://storage.googleapis.com/bucket/b2c31290d9d8.wav"
+  // })
+  //   .then(({ data }) => {
+  //     const transcriptID = data?.id;
+  //     const status = "abcd";
+  //     const ans = {};
+  //     while(status!="completed") {
+  //       assembly.get(`/transcript/${transcriptID}`)
+  //             .then(({ data }) => {
+  //               ans = data;
+  //             })
+  //             .catch(console.error);
+  //     }
+  //     console.log(ans);
+  //   })
+  //   .catch(console.error);
+  // const client = new speech.SpeechClient();
+
+  // const fileName = 'assets/converted.mp3';
+
+  // const config = {
+  //   encoding: 'LINEAR16',
+  //   sampleRateHertz: 44100,
+  //   languageCode: 'en-US',
+  //   alternativeLanguageCodes: ['es-ES', 'en-US'],
+  // };
+
+  // const audio = {
+  //   content: fs.readFileSync(fileName).toString('base64'),
+  // };
+
+  // const request = {
+  //   config: config,
+  //   audio: audio,
+  // };
+
+  // const getLang = async () => {
+  //   const [response] = await client.recognize(request);
+  //   const transcription = response.results
+  //                                 .map(result => result.alternatives[0].transcript)
+  //                                 .join('\n');
+  //   console.log(`Transcription: ${transcription}`);
+  // }
+  // getLang();
+}
+
+main();
