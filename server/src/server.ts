@@ -6,6 +6,7 @@ import * as bodyParser from 'body-parser';
 import * as mongoose from 'mongoose';
 //server file imports
 import AuthRouter from './routers/AuthRouter';
+import SubsRouter from './routers/SubsRouter';
 import { getEnvironmentVariables } from './environments/env';
 
 export class Server {
@@ -20,7 +21,7 @@ export class Server {
 
   setConfigurations() {
     // boilerplate configuration of the packages
-    this.connectMongoDb();
+    // this.connectMongoDb();
     this.configureBodyParser();
     console.log('Configurations have been successfully setup');
   }
@@ -33,16 +34,14 @@ export class Server {
 
   setRoutes() {
     // all the server api routes go here
-    this.app.use('/auth', AuthRouter);
+    // this.app.use('/auth', AuthRouter);
+    this.app.use('/subs', SubsRouter);
   }
 
   connectMongoDb() {
     // establishing connection with mongodb
     const databaseUrl = getEnvironmentVariables().db_url;
-    mongoose.connect(databaseUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    mongoose.connect(databaseUrl, {});
     mongoose.connection.on('open', () => {
       console.log('connection successfully made with database');
     });
