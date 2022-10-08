@@ -10,14 +10,21 @@ interface IUserDetail {
 }
 export type UserDetailDocument = IUserDetail & Document;
 
-const UserDetailSchema: Schema = new Schema({
+const UserDetailSchema: Schema<UserDetailDocument> = new Schema({
   name: { type: String, required: false, default: '' },
   avatar: { type: String, required: false },
   work_mail: { type: String, required: false, default: '' },
   phone: { type: Number, required: false, default: 0 },
-  created_at: { type: Date, required: false, default: new Date() },
-  updated_at: { type: Date, required: true, default: new Date() },
-  isActive: { type: Boolean, required: false, default: false }
+  created_at: {
+    type: String,
+    required: false,
+    default: new Date().toISOString()
+  },
+  updated_at: {
+    type: String,
+    required: true,
+    default: new Date().toISOString()
+  }
 });
 
 const UserDetail: Model<UserDetailDocument> = model(

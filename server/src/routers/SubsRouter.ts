@@ -1,7 +1,5 @@
 import { Router } from 'express';
-import { AuthController } from '../controllers/AuthController';
-// import { AuthSetup } from '../middlewares/authentication-setup';
-// import { AuthValidators } from '../validators/AuthValidators';
+import { SubsController } from '../controllers/SubsController';
 
 // The file is responsible to process the api requests and call the required middleware, validator and controller in a centralized place
 
@@ -9,7 +7,7 @@ import { AuthController } from '../controllers/AuthController';
 //@AUTH not required
 //@FUNCTIONS all auth related work
 
-class AuthRouter {
+class SubsRouter {
   public router: Router;
   constructor() {
     this.router = Router();
@@ -24,10 +22,8 @@ class AuthRouter {
   postRoutes(): void {
     // add all post routes here
     this.router.post(
-      '/login', // path of api request
-      // AuthSetup.isAuthenticated, // checks if the request contains a valid token (checks if user is logged in. Remove this middleware if user is supposed to not be logged in).
-      // AuthValidators.login, // validates the body content.
-      AuthController.login // Main business logic of the server that returns the required response.
+      '/', // path of api request
+      SubsController.generateSubs // Main business logic of the server that returns the required response.
     );
   }
   putRoutes(): void {
@@ -39,4 +35,4 @@ class AuthRouter {
     // this.router.delete()
   }
 }
-export default new AuthRouter().router;
+export default new SubsRouter().router;
