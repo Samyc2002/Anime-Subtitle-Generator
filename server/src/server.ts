@@ -28,7 +28,7 @@ export class Server {
 
   configureBodyParser() {
     this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
     console.log('body-parser setup');
   }
 

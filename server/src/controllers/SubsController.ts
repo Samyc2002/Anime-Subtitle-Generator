@@ -9,13 +9,24 @@ import axios from 'axios';
 export class SubsController {
   static async generateSubs(req: Request, res: Response, next: NextFunction) {
     try {
-      // This extracts the audio from the video
+      const videoFilePath = 'src/assets/video.mp4';
+      const audioFilePath = 'src/assets/audio.mp4';
+      // console.log(req?.file?.buffer);  // Writing video file to memory
+      fs.writeFile(videoFilePath, req?.file?.buffer as Buffer, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      console.log('Generating audio');
+      // This extracts the audio from the video and writes to memory
       await extractAudio({
         // this is the input video file in mp4
-        input: 'src/controllers/video_recording.mp4',
+        input: videoFilePath,
         // this is the output audio file in mp3
-        output: 'converted.mp3'
+        output: audioFilePath
       });
+      console.log('Audio generated');
 
       // Some configurations for the speech to text api
       const assembly = {
@@ -28,25 +39,30 @@ export class SubsController {
         }
       };
 
-      // Audio file that neds to be converted to text
-      const file = './converted.mp3';
       // URI of the audio file after uploading it to the bucket
       var fileURI = '';
       // Source language code
-      const langCode = 'ja';
+      const langCode = req.body?.sourceCode;
       // Target language code
-      const targetLangCode = 'en';
+      const targetLangCode = req.body?.destCode;
 
       // File reading and transcripting
-      fs.readFile(file, async (err, data) => {
+      fs.readFile(audioFilePath, async (err, data) => {
         if (err) return console.error(err);
-        console.log(data);
+        // console.log(data);
 
         // Uploading file to bucket
         const fileData = await axios.post('/upload', data, assembly);
         // Getting uploaded URI
         fileURI = fileData?.data?.upload_url;
 
+        // Deleting generated files as they are no longer needed
+        console.log('Deleting generated files');
+        fs.unlinkSync(videoFilePath);
+        fs.unlinkSync(audioFilePath);
+        console.log('Generated files deleted');
+
+        console.log('Generating Transcript');
         // Initiating transcript generation
         const postData = await axios.post(
           '/transcript',
@@ -58,7 +74,9 @@ export class SubsController {
         );
         // Getting transcript id
         const transcriptID = postData?.data?.id;
+        console.log(`Transcript generated with id ${transcriptID}`);
 
+        console.log('Fetching Transcript data');
         // Fetching the transcript initially
         var getData = await axios.get(`/transcript/${transcriptID}`, assembly);
         // If the transcript hasn't been generated yet, wait till it gets generated and fetch again.
@@ -67,37 +85,48 @@ export class SubsController {
 
         // Get the text from the audio file
         const sourceText = getData?.data?.text;
+        console.log('Transcript data fetched: ' + sourceText);
 
+        console.log('Generating translation');
         // Some configurations for the translation API
         const encodedParams = new URLSearchParams();
         encodedParams.append('q', sourceText);
         encodedParams.append('target', targetLangCode);
         encodedParams.append('source', langCode);
 
-        const options = {
+        // Translating the text obtained from the audio
+        axios({
           method: 'POST',
           url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
             'Accept-Encoding': 'application/gzip',
             'X-RapidAPI-Key':
-              '3859461e85msh614bcd665e1cd5ep1bb6e7jsn196e6e191068',
+              '5d71a5491amsh613ade763af38efp1cbf7djsn5bc69a31d6db',
             'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
           },
           data: encodedParams
-        };
-
-        // Translating the text obtained from the audio
-        axios
-          .request(options)
+        })
           .then(function (response) {
             // Printing the output, i.e, the obtained transcript
             console.log(
-              response?.data?.data?.translations?.[0]?.translatedText
+              'Translation generated: ' +
+                response?.data?.data?.translations?.[0]?.translatedText
             );
+            res.status(200).json({
+              data: response?.data?.data?.translations?.[0]?.translatedText,
+              error: null,
+              success: true
+            });
           })
           .catch(function (error) {
+            console.log('Error obtained:  ' + error);
             console.error(error);
+            res.status(200).json({
+              data: null,
+              error: error,
+              success: false
+            });
           });
       });
     } catch (err) {
