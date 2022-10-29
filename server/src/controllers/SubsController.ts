@@ -11,12 +11,12 @@ export class SubsController {
     try {
       const videoFilePath = 'src/assets/video.mp4';
       const audioFilePath = 'src/assets/audio.mp4';
-      console.log(req?.file?.buffer); // Writing video file to memory
-      fs.writeFile(videoFilePath, req?.file?.buffer as Buffer, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      // console.log(req?.file?.buffer);  // Writing video file to memory
+      /* fs.writeFile(videoFilePath, req?.file?.buffer as Buffer, (err) => { */
+      /*   if (err) { */
+      /*     console.log(err); */
+      /*   } */
+      /* }); */
 
       console.log('Generating audio');
       // This extracts the audio from the video and writes to memory
