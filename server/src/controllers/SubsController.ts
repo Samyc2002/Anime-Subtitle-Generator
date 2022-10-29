@@ -58,7 +58,7 @@ export class SubsController {
 
         // Deleting generated files as they are no longer needed
         console.log('Deleting generated files');
-        fs.unlinkSync(videoFilePath);
+        /* fs.unlinkSync(videoFilePath); */
         fs.unlinkSync(audioFilePath);
         console.log('Generated files deleted');
 
@@ -98,14 +98,14 @@ export class SubsController {
         axios({
           method: 'POST',
           url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
+          data: encodedParams,
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
             'Accept-Encoding': 'application/gzip',
             'X-RapidAPI-Key':
-              '5d71a5491amsh613ade763af38efp1cbf7djsn5bc69a31d6db',
+              '2d7e4b3239msh8ab7d5858fc71fcp1a2797jsne8aca441c7f3',
             'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
-          },
-          data: encodedParams
+          }
         })
           .then(function (response) {
             // Printing the output, i.e, the obtained transcript
