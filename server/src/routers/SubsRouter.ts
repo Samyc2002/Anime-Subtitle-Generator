@@ -1,17 +1,18 @@
 import { Router } from 'express';
 import { SubsController } from '../controllers/SubsController';
+import uploadFile from '../middlewares/fileUpload';
 import * as multer from 'multer';
 
 //create storage for uploaded files
 var storage = multer.memoryStorage();
-// multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, 'src/assets/');
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, file.originalname);
-//   }
-// });
+/* var storage = multer.diskStorage({ */
+/*   destination: function (req, file, cb) { */
+/*     cb(null, 'src/assets/'); */
+/*   }, */
+/*   filename: function (req, file, cb) { */
+/*     cb(null, file.originalname); */
+/*   } */
+/* }); */
 var upload = multer({
   storage: storage
 });
@@ -39,6 +40,7 @@ class SubsRouter {
     this.router.post(
       '/', // path of api request
       upload.single('file'), // middleware to handle file upload
+      /* uploadFile, // middleware to handle file upload */
       SubsController.generateSubs // Main business logic of the server that returns the required response.
     );
   }

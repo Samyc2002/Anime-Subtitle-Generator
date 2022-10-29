@@ -43,29 +43,26 @@ function App() {
     if (!files.length) return;
     const file = files[0];
 
-    var formdata = new FormData();
-    let formData = new FormData();
-    formData.append("file", file);
-    formdata.append("sourceCode", "ja");
-    formdata.append("destCode", "en");
+    var data = new FormData();
+    data.append("file", file);
+    data.append("sourceCode", "ja");
+    data.append("destCode", "en");
 
-    console.log("API call");
-    var config = {
-      method: "POSt",
-      url: "localhost:5000/subs/",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      data: formData,
-    };
-    axios(`localhost:5000/subs/`, config)
-      .then(({ data }) => {
-        console.log(data);
-        if (data.success) setTranscriptText(data.data);
-        else setTranscriptText(data.erorr);
-        document.getElementById("file-input").value = null;
-      })
-      .catch((err) => console.log);
+    console.log("API running");
+    /* var requestOptions = { */
+    /*   method: "POST", */
+    /*   body: data, */
+    /*   redirect: "follow", */
+    /* }; */
+    /**/
+    /* fetch(`localhost:5000/subs/`, requestOptions) */
+    /*   .then(({ data }) => { */
+    /*     console.log(data); */
+    /*     if (data.success) setTranscriptText(data.data); */
+    /*     else setTranscriptText(data.erorr); */
+    /*     document.getElementById("file-input").value = null; */
+    /*   }) */
+    /*   .catch((err) => console.log); */
   };
 
   return (
