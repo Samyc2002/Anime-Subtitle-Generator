@@ -9,9 +9,9 @@ import axios from 'axios';
 export class SubsController {
   static async generateSubs(req: Request, res: Response, next: NextFunction) {
     try {
-      const videoFilePath = 'src/assets/video.mp4';
-      const audioFilePath = 'src/assets/audio.mp4';
-      // console.log(req?.file?.buffer);  // Writing video file to memory
+      const videoFilePath = 'assets/video.mp4';
+      const audioFilePath = 'assets/audio.mp4';
+      console.log(req.files);  // Writing video file to memory
       /* fs.writeFile(videoFilePath, req?.file?.buffer as Buffer, (err) => { */
       /*   if (err) { */
       /*     console.log(err); */
@@ -103,7 +103,7 @@ export class SubsController {
             'content-type': 'application/x-www-form-urlencoded',
             'Accept-Encoding': 'application/gzip',
             'X-RapidAPI-Key':
-              '2d7e4b3239msh8ab7d5858fc71fcp1a2797jsne8aca441c7f3',
+              '2aac47a38dmsh5acbe927ef6b633p116962jsn0dfe8f819030',
             'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
           }
         })
@@ -121,7 +121,6 @@ export class SubsController {
           })
           .catch(function (error) {
             console.log('Error obtained:  ' + error);
-            console.error(error);
             res.status(200).json({
               data: null,
               error: error,

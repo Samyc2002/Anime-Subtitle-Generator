@@ -1,18 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import * as multer from 'multer';
+import * as multer from "multer";
 
-const uploadFile = (req: Request, res: Response, next: NextFunction) => {
-  const upload = multer().single('file');
+//create storage for uploaded files
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./assets");
+  },
 
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      // A Multer error occurred when uploading.
-    } else if (err) {
-      // An unknown error occurred when uploading.
-    }
-    // Everything went fine.
-    next();
-  });
+  filename: function (req: any, file: any, cb: any) {
+    cb(null, "video.mp4");
+  }
+});
+
+const fileFilter = (req: any, file: any, cb: any) => {
+  cb(null, true);
 };
 
-export default uploadFile;
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+export default upload;
